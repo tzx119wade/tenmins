@@ -9,12 +9,14 @@ from django.contrib.auth.models import User
 # Create your views here.
 
 def index(request,cate=None):
-    print (request.user.username)
     context = {}
     if cate == None:
         result_list = Article.objects.all()
-    if cate == 'editor':
-        result_list = Article.objects.filter(editor_choice=True)
+    if cate == 'hot':
+        result_list = Article.objects.filter(cate_choice='hot')
+    if cate == 'best':
+        result_list = Article.objects.filter(cate_choice='best')
+    
 
     page_robot = Paginator(result_list, 9)
     page_num = request.GET.get('page')

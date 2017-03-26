@@ -58,6 +58,12 @@
             <p>
               {{ article.content|linebreaksbr }}
             </p>
+            {% if article.cate_choice == 'best' %}
+                <a href="{% url 'index' cate='best' %}" class="ui teal label">Best</a>
+            {% else %}
+                <a href="{% url 'index' cate='hot'%}" class="ui red label">Hot</a>
+
+            {% endif %}
             <div class="ui divider"></div>
             <form class="ui form" action="#" method="post">
                 <button class="ui  tiny button" type="submit" name="vote" value="like" >

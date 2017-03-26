@@ -12,6 +12,12 @@ class Article(models.Model):
     likes = models.IntegerField(default=0)
     createtime = models.DateField(default=timezone.now)
     editor_choice = models.BooleanField(default=False)
+    CATE_CHOICE = {
+        ('best','best'),
+        ('hot','hot'),
+    }
+
+    cate_choice = models.CharField(choices=CATE_CHOICE,max_length=10,blank=True,null=True)
 
     def __str__(self):
         return self.title

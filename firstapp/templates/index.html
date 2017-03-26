@@ -46,18 +46,25 @@
     </div>
     <div class="ui inverted segment container nav">
         <div class="ui  three borderless  item  menu">
-          {% if 'editor' not in request.path %}
+          {% if 'best' not in request.path and 'hot' not in request.path %}
             <a class="active item" href="{% url 'index' %}"> All </a>
           {% else %}
             <a class="item" href="{% url 'index' %}"> All </a>
           {% endif %}
-            <a class="item"> New </a>
 
-            {% if  'editor' in request.path %}
-              <a class="active item" href="{% url 'index' cate='editor' %}"> Editor's </a>
+            {% if  'hot' in request.path %}
+              <a class="active item" href="{% url 'index' cate='hot' %}"> Hot </a>
             {% else %}
-                <a class="item" href="{% url 'index' cate='editor' %}"> Editor's </a>
+                <a class="item" href="{% url 'index' cate='hot' %}"> Hot </a>
             {% endif %}
+
+            {% if 'best' in request.path %}
+              <a href="{% url 'index' cate='best' %}" class="active item">Best</a>
+            {% else %}
+              <a href="{% url 'index' cate='best' %}" class="item">Best</a>
+            {% endif %}
+
+
         </div>
     </div>
 
