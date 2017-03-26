@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect,HttpResponse
-from firstapp.models import Article, Comment
+from firstapp.models import Article, Comment, Tickets
 from firstapp.forms import CommentForm
 from django.core.paginator import Paginator, EmptyPage,PageNotAnInteger
 from django.contrib.auth import login as auth_login , authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 
 # Create your views here.
 
@@ -16,7 +17,7 @@ def index(request,cate=None):
         result_list = Article.objects.filter(cate_choice='hot')
     if cate == 'best':
         result_list = Article.objects.filter(cate_choice='best')
-    
+
 
     page_robot = Paginator(result_list, 9)
     page_num = request.GET.get('page')
@@ -56,6 +57,7 @@ def index(request,cate=None):
 
 
 def detail(request, page_num, error_form=None):
+    context = {}
 
     if error_form == None:
         form = CommentForm()
@@ -65,13 +67,39 @@ def detail(request, page_num, error_form=None):
 
     article = Article.objects.get(id=page_num)
     comments = article.comments.all()
-    context = {}
+    # 处理get请求，显示对应用户的投票
+    if request.user.is_authenticated:
+        try:
+            ticket = Tickets.objects.get(voter_id = request.user.id,article_id = article.id)
+            context['ticket'] = ticket
+        except ObjectDoesNotExist :
+            pass
+
+
+    ticket_count = article.tickers.count()
+    context['ticket_count'] = ticket_count
+
     context['article'] = article
     context['form'] = form
     context['comments'] = comments
     return render(request, 'detail.html', context)
 
+def detail_vote(request,id):
+    if request.user.is_authenticated:
+        try:
+            ticket = Tickets.objects.get(voter_id=request.user.id,article_id=id)
+        except ObjectDoesNotExist:
+            voter = User.objects.get(id = request.user.id)
+            article = Article.objects.get(id=id)
+            ticket = Tickets(voter=voter,article=article)
 
+        vote = request.POST['vote']
+        ticket.vote = vote
+        ticket.save()
+        return redirect('detail', page_num=id)
+
+    else:
+        return redirect('register')
 
 def detail_comment(request,page_num):
         form = CommentForm(request.POST)

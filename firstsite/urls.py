@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from firstapp.views import index, detail, detail_comment, register, login
+from firstapp.views import index, detail, detail_comment, register, login,detail_vote
 from django.contrib.auth.views import logout
 
 
@@ -25,6 +25,7 @@ urlpatterns = [
     url(r'^index/(?P<cate>[A-Za-z]+)/', index, name="index"),
     url(r'^detail/(?P<page_num>\d+)', detail, name='detail'),
     url(r'^comment/(?P<page_num>\d+)$', detail_comment, name='detail_comment'),
+    url(r'^detail/vote/(?P<id>\d+)$', detail_vote, name='detail_vote'),
     url(r'^register/$', register, name='register'),
     url(r'^login/$', login, name='login' ),
     url(r'^logout/$', logout ,{'next_page':'register'}, name='logout'),

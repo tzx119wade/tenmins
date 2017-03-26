@@ -32,14 +32,27 @@
                             <div class="ui mini circular image">
                                 <img src="{% static 'images/default.png' %}" alt="">
                             </div>
+                            {% if request.user.is_authenticated %}
+                              <span>{{ request.user.username }}</span>
 
-                            <span>admin</span>
+                            {% else %}
+                              <span>游客你好</span>
+
+                            {% endif %}
 
                         </h5>
                 </div>
 
                 <div class="item">
-                    <a href="#" class="ui inverted circular button">Signup/Login</a>
+                  {% if request.user.is_authenticated %}
+                  <a href="{% url 'logout' %}" class="ui inverted circular button">退出</a>
+
+
+                  {% else %}
+                    <a href="{% url 'login' %}" class="ui inverted circular button">登录／注册</a>
+
+                  {% endif %}
+
                 </div>
             </div>
         </div>
@@ -53,7 +66,7 @@
             <span style="color:#bbbbbb">0</span>
             <span class="" style="color:rgb(226, 226, 226)">|</span>
             <i class="icon grey checkmark"></i>
-            <span style="color:#bbbbbb">0 people got it</span>
+            <span style="color:#bbbbbb">{{ ticket_count }}   people got it</span>
 
             <p>
               {{ article.content|linebreaksbr }}
@@ -65,16 +78,45 @@
 
             {% endif %}
             <div class="ui divider"></div>
-            <form class="ui form" action="#" method="post">
-                <button class="ui  tiny button" type="submit" name="vote" value="like" >
-                    <i class="icon checkmark"></i>
-                    Get it!
-                </button>
 
-                <button class="ui  tiny button" type="submit" name="vote" value="dislike" >
-                    <i class="icon bomb"></i>
-                    Hmmm...
-                </button>
+
+
+            <form class="ui form" action="{% url 'detail_vote' article.id %}" method="post">{% csrf_token %}
+
+              {% if ticket.vote == 'like' %}
+              <button class="ui red tiny button" type="submit" name="vote" value="normal" >
+                  <i class="icon checkmark"></i>
+                Like it!
+              </button>
+
+              <button class="ui  tiny button" type="submit" name="vote" value="dislike" >
+                  <i class="icon bomb"></i>
+                  Dislike...
+              </button>
+
+              {% elif ticket.vote == 'dislike' %}
+              <button class="ui tiny button" type="submit" name="vote" value="like" >
+                  <i class="icon checkmark"></i>
+                Like it!
+              </button>
+
+              <button class="ui red tiny button" type="submit" name="vote" value="normal" >
+                  <i class="icon bomb"></i>
+                  Dislike...
+              </button>
+
+              {% else %}
+              <button class="ui  tiny button" type="submit" name="vote" value="like" >
+                  <i class="icon checkmark"></i>
+                Like it!
+              </button>
+
+              <button class="ui  tiny button" type="submit" name="vote" value="dislike" >
+                  <i class="icon bomb"></i>
+                  Dislike...
+              </button>
+
+              {% endif %}
 
                 <button class="ui secondary circular tiny right floated pin icon button">
                     <i class="pin icon"></i>

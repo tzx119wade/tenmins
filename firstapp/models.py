@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from faker import Faker
 import re
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Article(models.Model):
@@ -31,3 +32,18 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Tickets(models.Model):
+    voter = models.ForeignKey(to=User, related_name='tickers', blank=True, null=True)
+    article = models.ForeignKey(to=Article, related_name='tickers', blank=True, null=True)
+    VOTE_CHOICE = {
+        ('like','like'),
+        ('dislike','dislike'),
+        ('normal','normal'),
+    }
+    vote = models.CharField(choices=VOTE_CHOICE,max_length=10, blank=True, null=True)
+    created_date = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return str(self.id)
