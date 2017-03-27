@@ -57,7 +57,7 @@
             </div>
         </div>
 
-        <div class="ui vertical inverted detail segment" style="background-image: url({% static 'images/detail.jpg' %})"></div>
+        <div class="ui vertical inverted detail segment"></div>
 
         <div class="ui basic segment container" style="width:700px;border:none;box-shadow:none;margin-top:50px;">
             <img src="{{ article.img }}" alt="" class="ui image"/>
@@ -81,47 +81,24 @@
 
 
 
-            <form class="ui form" action="{% url 'detail_vote' article.id %}" method="post">{% csrf_token %}
+            <form class="ui form" action="{% url 'detail_vote' id=article.id %}" method="post">{% csrf_token %}
 
-              {% if ticket.vote == 'like' %}
-              <button class="ui red tiny button" type="submit" name="vote" value="normal" >
-                  <i class="icon checkmark"></i>
-                Like it!
-              </button>
+              <div class="ui buttons">
+                {% if ticket.vote == 'like' %}
+                  <button class="ui green button" type="submit" name="vote" value="normal">like</button>
+                  <div class="or"></div>
+                  <button class="ui button" type="submit" name="vote" value="dislike">Hmm...</button>
+                {% elif ticket.vote == 'dislike' %}
+                  <button class="ui button" type="submit" name="vote" value="like">like</button>
+                  <div class="or"></div>
+                  <button class="ui green button" type="submit" name="vote" value="normal">Hmm...</button>
+                {% else %}
+                  <button class="ui button" type="submit" name="vote" value="like">like</button>
+                  <div class="or"></div>
+                  <button class="ui button" type="submit" name="vote" value="dislike">Hmm...</button>
+                {% endif %}
 
-              <button class="ui  tiny button" type="submit" name="vote" value="dislike" >
-                  <i class="icon bomb"></i>
-                  Dislike...
-              </button>
-
-              {% elif ticket.vote == 'dislike' %}
-              <button class="ui tiny button" type="submit" name="vote" value="like" >
-                  <i class="icon checkmark"></i>
-                Like it!
-              </button>
-
-              <button class="ui red tiny button" type="submit" name="vote" value="normal" >
-                  <i class="icon bomb"></i>
-                  Dislike...
-              </button>
-
-              {% else %}
-              <button class="ui  tiny button" type="submit" name="vote" value="like" >
-                  <i class="icon checkmark"></i>
-                Like it!
-              </button>
-
-              <button class="ui  tiny button" type="submit" name="vote" value="dislike" >
-                  <i class="icon bomb"></i>
-                  Dislike...
-              </button>
-
-              {% endif %}
-
-                <button class="ui secondary circular tiny right floated pin icon button">
-                    <i class="pin icon"></i>
-                    Saved
-                </button>
+              </div>
             </form>
         </div>
 

@@ -57,6 +57,7 @@ def index(request,cate=None):
 
 
 def detail(request, page_num, error_form=None):
+    print ('程序执行了get')
     context = {}
 
     if error_form == None:
