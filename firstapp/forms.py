@@ -15,9 +15,10 @@ def lessword(comment):
         raise ValidationError('评论内容需超过4个字～～')
 
 class CommentForm(forms.Form):
+
     name = forms.CharField(max_length=50)
     comment = forms.CharField(
-        widget = forms.Textarea(),
+        widget = forms.Textarea(attrs={'placeholder':'添加一条评论吧～'}),
         error_messages = {
             'require':'亲～这是必填项哟',
         },

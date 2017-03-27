@@ -22,7 +22,9 @@
         <div class="ui inverted top fixed menu borderless red menu">
             <div class="header item">
                 <div class="ui image">
+                  <a href="{% url 'index' %}">
                     <img src="{% static 'images/tenlogo.png' %}" alt="">
+                  </a>
                 </div>
             </div>
 
@@ -66,7 +68,7 @@
             <span style="color:#bbbbbb">0</span>
             <span class="" style="color:rgb(226, 226, 226)">|</span>
             <i class="icon grey checkmark"></i>
-            <span style="color:#bbbbbb">{{ ticket_count }}   people got it</span>
+            <span style="color:#bbbbbb">{{ all_ticket_count }}   people got it</span>
 
             <p>
               {{ article.content|linebreaksbr }}
@@ -83,22 +85,58 @@
 
             <form class="ui form" action="{% url 'detail_vote' id=article.id %}" method="post">{% csrf_token %}
 
-              <div class="ui buttons">
-                {% if ticket.vote == 'like' %}
-                  <button class="ui green button" type="submit" name="vote" value="normal">like</button>
-                  <div class="or"></div>
-                  <button class="ui button" type="submit" name="vote" value="dislike">Hmm...</button>
-                {% elif ticket.vote == 'dislike' %}
-                  <button class="ui button" type="submit" name="vote" value="like">like</button>
-                  <div class="or"></div>
-                  <button class="ui green button" type="submit" name="vote" value="normal">Hmm...</button>
-                {% else %}
-                  <button class="ui button" type="submit" name="vote" value="like">like</button>
-                  <div class="or"></div>
-                  <button class="ui button" type="submit" name="vote" value="dislike">Hmm...</button>
-                {% endif %}
+              {% if request.user.is_authenticated %}
+                    {% if user_vote_ticket_like != 0 %}
+                      <div class="ui labeled button" tabindex="0">
+                        <button type="submit" name="vote" value="like" class="ui red button">
+                          <i class="thumbs up icon"></i>Like
+                        </button>
+                        <a href="#" class="ui basic label">{{ ticket_like_count }}</a>
+                      </div>
+                    {% else %}
+                      <div class="ui labeled button" tabindex="0">
+                        <button type="submit" name="vote" value="like" class="ui button">
+                          <i class="thumbs up icon"></i>Like
+                        </button>
+                        <a href="#" class="ui basic label">{{ ticket_like_count }}</a>
+                      </div>
+                    {% endif %}
 
-              </div>
+                  {% if user_vote_ticket_dislike != 0 %}
+                      <div class="ui labeled button" tabindex="0">
+                        <button type="submit" name="vote" value="dislike" class="ui blue button">
+                          <i class="thumbs down icon"></i>Hmm..
+                        </button>
+                        <a href="#" class="ui basic label">{{ ticket_dislike_count }}</a>
+                      </div>
+                  {% else %}
+                      <div class="ui labeled button" tabindex="0">
+                          <button type="submit" name="vote" value="dislike" class="ui button">
+                            <i class="thumbs down icon"></i>Hmm..
+                          </button>
+                          <a href="#" class="ui basic label">{{ ticket_dislike_count }}</a>
+                      </div>
+
+                  {% endif %}
+
+              {% else %}
+                  <div class="ui labeled button" tabindex="0">
+                      <button type="submit" name="vote" value="like" class="ui button">
+                        <i class="thumbs up icon"></i>Like
+                      </button>
+                      <a href="#" class="ui basic label">{{ ticket_like_count }}</a>
+                  </div>
+
+                  <div class="ui labeled button" tabindex="0">
+                      <button type="submit" name="vote" value="dislike" class="ui button">
+                        <i class="thumbs down icon"></i>Hmm..
+                      </button>
+                      <a href="#" class="ui basic label">{{ ticket_dislike_count }}</a>
+                  </div>
+
+
+              {% endif %}
+
             </form>
         </div>
 
@@ -127,8 +165,9 @@
             </div>
 
 
-            <div class="ui divider"></div>
+
             <form class="ui tiny form error" action='{% url 'detail_comment' article.id %}' method="post">{% csrf_token %}
+
                 <!--这里补充评论表单代码-->
                 {% if form.errors  %}
 

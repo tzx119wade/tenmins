@@ -68,37 +68,38 @@ def detail(request, page_num, error_form=None):
 
     article = Article.objects.get(id=page_num)
     comments = article.comments.all()
-    # 处理get请求，显示对应用户的投票
+    # 处理投票业务的数据渲染
+
+    all_ticket_count = article.tickers.count()
+    ticket_like_count = article.tickers.filter(vote='like').count()
+    ticket_dislike_count = article.tickers.filter(vote='dislike').count()
+    context['all_ticket_count'] = all_ticket_count
+    context['ticket_like_count'] = ticket_like_count
+    context['ticket_dislike_count'] = ticket_dislike_count
+
     if request.user.is_authenticated:
-        try:
-            ticket = Tickets.objects.get(voter_id = request.user.id,article_id = article.id)
-            context['ticket'] = ticket
-        except ObjectDoesNotExist :
-            pass
+        user_vote_ticket_like = article.tickers.filter(voter_id=request.user.id,vote='like').count()
+        print ('like_count:',user_vote_ticket_like)
+        user_vote_ticket_dislike = article.tickers.filter(voter_id=request.user.id,vote='dislike').count()
+        print ('dislike_count:',user_vote_ticket_dislike)
+        context['user_vote_ticket_like'] = user_vote_ticket_like
+        context['user_vote_ticket_dislike'] = user_vote_ticket_dislike
 
-
-    ticket_count = article.tickers.count()
-    context['ticket_count'] = ticket_count
 
     context['article'] = article
     context['form'] = form
     context['comments'] = comments
     return render(request, 'detail.html', context)
 
-def detail_vote(request,id):
+
+def detail_vote(request, id):
     if request.user.is_authenticated:
-        try:
-            ticket = Tickets.objects.get(voter_id=request.user.id,article_id=id)
-        except ObjectDoesNotExist:
-            voter = User.objects.get(id = request.user.id)
-            article = Article.objects.get(id=id)
-            ticket = Tickets(voter=voter,article=article)
-
         vote = request.POST['vote']
-        ticket.vote = vote
+        article = Article.objects.get(id=id)
+        user = User.objects.get(username=request.user.username)
+        ticket = Tickets(voter=user,article=article,vote=vote)
         ticket.save()
-        return redirect('detail', page_num=id)
-
+        return redirect('detail',id)
     else:
         return redirect('register')
 
