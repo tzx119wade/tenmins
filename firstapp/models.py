@@ -33,6 +33,17 @@ class Comment(models.Model):
     def __str__(self):
         return self.name
 
+# 创建新的评论数据结构
+class Comment_New(models.Model):
+    publisher = models.ForeignKey(to=User,related_name='comment_publisher', blank=True, null=True)
+    belong_to = models.ForeignKey(to=Article, related_name='article_comment', blank=True, null=True)
+    avatar = models.URLField(default='images/default.png')
+    content = models.TextField(blank=True, null=True)
+    created_date = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.publisher.username
+
 
 class Tickets(models.Model):
     voter = models.ForeignKey(to=User, related_name='tickers', blank=True, null=True)

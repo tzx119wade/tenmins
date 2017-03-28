@@ -16,7 +16,7 @@ def lessword(comment):
 
 class CommentForm(forms.Form):
 
-    name = forms.CharField(max_length=50)
+    # name = forms.CharField(max_length=50)
     comment = forms.CharField(
         widget = forms.Textarea(attrs={'placeholder':'添加一条评论吧～'}),
         error_messages = {
@@ -24,6 +24,7 @@ class CommentForm(forms.Form):
         },
         validators=[keyword,lessword]
         )
+
 class LoginForm(forms.Form):
     username = forms.CharField()
     password = forms.CharField()

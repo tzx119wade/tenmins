@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect,HttpResponse
-from firstapp.models import Article, Comment, Tickets
+from firstapp.models import Article,Tickets, Comment_New
 from firstapp.forms import CommentForm
 from django.core.paginator import Paginator, EmptyPage,PageNotAnInteger
 from django.contrib.auth import login as auth_login , authenticate
@@ -57,7 +57,7 @@ def index(request,cate=None):
 
 
 def detail(request, page_num, error_form=None):
-    print ('程序执行了get')
+
     context = {}
 
     if error_form == None:
@@ -67,9 +67,10 @@ def detail(request, page_num, error_form=None):
         form = error_form
 
     article = Article.objects.get(id=page_num)
-    comments = article.comments.all()
-    # 处理投票业务的数据渲染
+    # 获取关联这篇文章的所有评论
+    comments = Comment_New.objects.filter(belong_to_id=article.id)
 
+    # 处理投票业务的数据渲染
     all_ticket_count = article.tickers.count()
     ticket_like_count = article.tickers.filter(vote='like').count()
     ticket_dislike_count = article.tickers.filter(vote='dislike').count()
@@ -103,17 +104,24 @@ def detail_vote(request, id):
     else:
         return redirect('register')
 
-def detail_comment(request,page_num):
+# 新的评论功能 用户可以对一篇文章点评多次
+def detail_comment(request, page_num):
+    # 判断是否登录
+    if request.user.is_authenticated:
+        # 表单绑定
         form = CommentForm(request.POST)
+        # 验证表单
         if form.is_valid():
-            name = form.cleaned_data['name']
             content = form.cleaned_data['comment']
-            a = Article.objects.get(id=page_num)
-            c = Comment(name=name, content=content,belong_to=a)
-            c.save()
-            return redirect('detail',a.id)
+            publisher = request.user
+            belong_to = Article.objects.get(id=page_num)
+
+            comment =  Comment_New(publisher=publisher, content=content, belong_to=belong_to)
+            comment.save()
+            return redirect('detail',page_num)
         else:
-            return detail(request, page_num=page_num,error_form=form)
+            return detail(request, page_num=page_num, error_form=form)
+
 
 # 注册业务
 def register(request):

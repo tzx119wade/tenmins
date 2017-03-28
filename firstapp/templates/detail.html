@@ -17,6 +17,7 @@
             line-height: 26px;
           }
         </style>
+        
     </head>
     <body>
         <div class="ui inverted top fixed menu borderless red menu">
@@ -91,7 +92,7 @@
                         <button type="submit" name="vote" value="like" class="ui red button">
                           <i class="thumbs up icon"></i>Like
                         </button>
-                        <a href="#" class="ui basic label">{{ ticket_like_count }}</a>
+                        <a href="#anchor_name" class="ui basic label">{{ ticket_like_count }}</a>
                       </div>
                     {% else %}
                       <div class="ui labeled button" tabindex="0">
@@ -149,12 +150,12 @@
                 {% for comment in comments%}
                 <div class="comment">
                   <a href="#" class="avatar">
-                    <img src="https://semantic-ui.com/images/avatar/small/matt.jpg" alt="" />
+                    <img src="https://semantic-ui.com/images/avatar/small/jenny.jpg" alt="" />
                   </a>
                   <div class="content">
-                    <a href="#" class="author">{{ comment.name }}</a>
+                    <a href="#" class="author">{{ comment.publisher.username }}</a>
                     <div class="metadata">
-                      <span class="date">{{ comment.createtime |date:"Y-m-d H:i:s"}}</span>
+                      <span class="date">{{ comment.created_date |date:"Y-m-d H:i:s"}}</span>
                     </div>
                     <div class="text">
                       {{ comment.content }}
@@ -164,38 +165,39 @@
                 {% endfor %}
             </div>
 
+            {% if request.user.is_authenticated %}
 
-
-            <form class="ui tiny form error" action='{% url 'detail_comment' article.id %}' method="post">{% csrf_token %}
-
+              <!--提交评论的表单渲染-->
+              <form class="ui tiny form error" action='{% url 'detail_comment' article.id %}' method="post">{% csrf_token %}
                 <!--这里补充评论表单代码-->
                 {% if form.errors  %}
-
                   <div class="ui error message">
                     {{ form.errors }}
                   </div>
-
                   {% for field in form %}
-                    <div class="{{ field.errors|yesno:'error, ' }} field">
+                  <div class="error field">
                       {{ field.label }}
                       {{ field }}
-                    </div>
+                  </div>
                   {% endfor %}
 
                 {% else %}
-
-                  {% for field in form %}
-                    <div class="required field">
-                      {{ field.label }}
-                      {{ field }}
-                    </div>
-
-                  {% endfor %}
-
+                {% for field in form %}
+                <div class="field">
+                  {{ field.label }}
+                  {{ field }}
+                </div>
+                {% endfor %}
 
                 {% endif %}
                 <button type="submit" class="ui purple button" style="margin-top:20px">Click</button>
-            </form>
+              </form>
+
+            {% else %}
+
+            <h3 class="ui grey center aligned sub header">赶紧登录，说说你的想法!</h3>
+
+            {% endif %}
 
         </div>
     </body>
