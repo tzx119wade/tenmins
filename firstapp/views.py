@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect,HttpResponse
 from firstapp.models import Article,Tickets, Comment_New
-from firstapp.forms import CommentForm
+from firstapp.forms import CommentForm, ArticleForm
 from django.core.paginator import Paginator, EmptyPage,PageNotAnInteger
 from django.contrib.auth import login as auth_login , authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
@@ -12,7 +12,7 @@ from django.core.exceptions import ObjectDoesNotExist
 def index(request,cate=None):
     context = {}
     if cate == None:
-        result_list = Article.objects.all()
+        result_list = Article.objects.order_by('-createtime')
     if cate == 'hot':
         result_list = Article.objects.filter(cate_choice='hot')
     if cate == 'best':
@@ -67,6 +67,10 @@ def detail(request, page_num, error_form=None):
         form = error_form
 
     article = Article.objects.get(id=page_num)
+    # 更新文章浏览量
+    article.views = article.views + 1
+    article.save()
+    context['view_count'] = article.views
     # 获取关联这篇文章的所有评论
     comments = Comment_New.objects.filter(belong_to_id=article.id)
 
@@ -80,9 +84,7 @@ def detail(request, page_num, error_form=None):
 
     if request.user.is_authenticated:
         user_vote_ticket_like = article.tickers.filter(voter_id=request.user.id,vote='like').count()
-        print ('like_count:',user_vote_ticket_like)
         user_vote_ticket_dislike = article.tickers.filter(voter_id=request.user.id,vote='dislike').count()
-        print ('dislike_count:',user_vote_ticket_dislike)
         context['user_vote_ticket_like'] = user_vote_ticket_like
         context['user_vote_ticket_dislike'] = user_vote_ticket_dislike
 
@@ -152,3 +154,33 @@ def login(request):
             return redirect('index')
     context['form']= form
     return render(request, 'register.html', context)
+
+
+# 发布文章
+def publish_get(request,error_form=None):
+    context = {}
+
+    if error_form != None:
+        form = error_form
+    else:
+        form = ArticleForm()
+
+    context['form'] = form
+    return render(request, 'publish.html', context)
+
+# 发布-POST
+def publish_post(request):
+    form = ArticleForm(request.POST)
+    if form.is_valid():
+        title = form.cleaned_data['title']
+        imgURL = form.cleaned_data['imgURL']
+        content = form.cleaned_data['content']
+        choice = form.cleaned_data['category']
+        user = request.user
+        article = Article(title=title, img=imgURL, content=content,cate_choice=choice,author=user)
+        article.save()
+        page_id = article.id
+        return redirect('detail',page_id)
+
+    else:
+        return publish_get(request,form)

@@ -9,15 +9,15 @@
     <title></title>
     <link rel="stylesheet" href="{% static 'css/semantic.css' %}" media="screen" title="no title" charset="utf-8">
     <link rel="stylesheet" href="{% static  'css/list_custom.css' %}" media="screen" title="no title" charset="utf-8">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 
 </head>
 
 <body>
     <div class="ui inverted top fixed menu borderless red menu">
         <div class="header item">
-            <div class="ui image">
-                <img src="{% static 'images/tenlogo.png' %}" alt="">
-            </div>
+
+            <h3><a href="#" style="color:White">TEN MINS</a></h3>
         </div>
 
         <div class="right menu">
@@ -28,7 +28,7 @@
                         </div>
 
                         {% if request.user.is_authenticated  %}
-                          <span>{{ request.user.username }}</span>
+                        <span>{{ request.user.username }}</span>
                         {% else %}
                           <span>游客你好</span>
                         {% endif %}
@@ -36,10 +36,13 @@
                     </h5>
             </div>
             <div class="item">
+              <a href="#" style="color:White">发布</a>
+            </div>
+            <div class="item">
                 {% if request.user.is_authenticated %}
-                  <a href="{% url 'logout' %}" class="ui inverted circular button">退出</a>
+                  <a href="{% url 'logout' %}" style="color:White">退出</a>
                 {% else %}
-                  <a href="{% url 'register' %}" class="ui inverted circular button">登录／注册</a>
+                  <a href="{% url 'register' %}" style="color:White">登录／注册</a>
                 {% endif %}
             </div>
         </div>

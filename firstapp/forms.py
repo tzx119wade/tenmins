@@ -29,3 +29,33 @@ class LoginForm(forms.Form):
     username = forms.CharField()
     password = forms.CharField()
     email = forms.CharField()
+
+
+class ArticleForm(forms.Form):
+
+    title = forms.CharField(
+        label='文章标题',
+        max_length=100,
+        error_messages = {'required':'亲～一定要有标题哟'},
+        validators = [keyword,lessword]
+        )
+
+        
+    content = forms.CharField(
+        label='内容',
+        error_messages = {'required':'亲～一定要有标题哟'},
+        validators = [lessword],
+        widget = forms.Textarea(),
+    )
+
+    imgURL = forms.CharField(label='封面图地址')
+
+    MY_CHOICES = (
+    ('hot', 'HOT'),
+    ('best', 'BEST'),
+                    )
+
+    category = forms.ChoiceField(choices=MY_CHOICES,
+                            label = '选择文章分类',
+                            widget=forms.RadioSelect,
+                                )

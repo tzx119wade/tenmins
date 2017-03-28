@@ -19,6 +19,7 @@ class Article(models.Model):
     }
 
     cate_choice = models.CharField(choices=CATE_CHOICE,max_length=10,blank=True,null=True)
+    author = models.ForeignKey(to=User,null=True,blank=True)
 
     def __str__(self):
         return self.title

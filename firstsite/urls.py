@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from firstapp.views import index, detail, detail_comment, register, login,detail_vote
+from firstapp.views import index, detail, detail_comment, register, login,detail_vote, publish_get,publish_post
 from django.contrib.auth.views import logout
 
 
@@ -29,4 +29,6 @@ urlpatterns = [
     url(r'^register/$', register, name='register'),
     url(r'^login/$', login, name='login' ),
     url(r'^logout/$', logout ,{'next_page':'register'}, name='logout'),
+    url(r'^publish/$', publish_get, name='publish_get'),
+    url(r'^publish/post/$', publish_post, name='publish_post'),
 ]
