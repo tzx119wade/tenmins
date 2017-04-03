@@ -1,0 +1,140 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="{% static 'css/semantic.css' %}" media="screen" title="no title" charset="utf-8">
+    <link rel="stylesheet" href="{% static  'css/list_custom.css' %}" media="screen" title="no title" charset="utf-8">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
+</head>
+<style media="screen">
+  .ui.inverted.fixed.top.borderless.menu {
+    background-color: #292525;
+  }
+</style>
+
+<body>
+  <div class="ui inverted fixed top borderless menu" style="height:60px;">
+    <div class="header item">
+      <img src="https://cdn.sspai.com/user/725653_1488337112561.png?imageMogr2/quality/95/thumbnail/!80x80r/gravity/Center/crop/80x80" alt="" class="ui avatar image" style="width:40px;height:40px">
+      <span style="font-size:16px">少数派</span>
+    </div>
+
+    <div class="right menu">
+      <div class="item">
+        <button type="button" class="ui inverted basic circular button">登录</button>
+      </div>
+    </div>
+  </div>
+
+  <!--搜索内容主体部分-->
+  <div class="ui vertical basic segment main" style="width:760px;position:absolute;transform:translate(-50%,0);left:50%;top:100px;">
+    <div class="container">
+      <form class="ui form" action="{% url 'search' %}" method="get">
+        <div class="field">
+          <div class="ui icon input">
+            {% if search_name != None %}
+              <input type="text" name="search" value="" placeholder="{{ search_name }}">
+              <i class="search inverted circular icon"></i>
+            {% else %}
+              <input type="text" name="search" value="" placeholder="请输入你感兴趣的内容...">
+              <i class="search inverted circular icon"></i>
+            {% endif %}
+          </div>
+        </div>
+      </form>
+      <!--菜单栏-->
+      <div class="ui secondary pointing menu">
+        <a href="#" class="active item">All</a>
+        <a href="#" class="item">Hot</a>
+        <a href="#" class="item">Best</a>
+      </div>
+
+      <!--重写卡片内容-->
+      {% if search_name != None %}
+          {% if article_list != None %}
+              {% for article in article_list %}
+                  <div class="ui segment" style="width:760px;height:260px;">
+        <div class="ui secondary menu">
+          <div class="item" style="padding-left:0px;">
+            <img src="{% static 'images/default.png' %}" class="ui circular image" style="width:40px;height:40px;">
+            <div class="ui list" style="margin-top:0px;margin-left:2px;">
+              <div class="item" style="color:#292525;font-weight:bold">
+                {{ article.author.username }}
+              </div>
+              <div class="item" style="font-size:10px;color:#9b9b9b">
+                {{ article.createtime }}
+              </div>
+            </div>
+          </div>
+          <div class="right menu">
+            <a href="#" class="item">
+              <i class="ellipsis horizontal icon"></i>
+            </a>
+          </div>
+        </div>
+
+        <a href="#" class="ui right floated image">
+          <img src="{{ article.img }}" alt="" style="object-fit:cover;width:180px;height:110px">
+        </a>
+
+        <h3 class="ui header" style="margin-top:0px;">{{ article.title }}</h3>
+        <p style="color:#4a4a4a;line-height:1.625;">{{ article.content | truncatewords:30 }}</p>
+        <div class="ui secondary menu">
+          <div class="item">
+            <i class="empty heart icon"></i>
+            <span>{{ article.views }}</span>
+          </div>
+          <div class="item">
+            <i class="comment outline icon"></i>
+            <span>{{ article.article_comment.count }}</span>
+          </div>
+
+        </div>
+      </div>
+              {% endfor %}
+          {% else %}
+            <h4 class="ui center aligned header">抱歉没有找到...</h4>
+          {% endif %}
+
+      {% else %}
+          <h4 class="ui center aligned header">搜索你感兴趣的内容...</h4>
+      {% endif %}
+
+
+      <!--分页区-->
+      {% if article_list != None %}
+      <div class="ui pagination menu" style="position:absolute;transform:translate(-50%,0);left:50%;">
+        {% if article_list.has_previous %}
+          <a href="{% url 'search_page' page=article_list.previous_page_number name=search_name %}" class="item">
+            <i class="left red arrow icon"></i>
+          </a>
+        {% else %}
+        <a href="#" class="disabled item">
+          <i class="left grey arrow icon"></i>
+        </a>
+        {% endif %}
+
+        {% if article_list.has_next %}
+        <a href="{% url 'search_page' page=article_list.next_page_number name=search_name%}" class="item">
+          <i class="right arrow red icon"></i>
+        </a>
+        {% else %}
+        <a href="#" class="disabled item">
+          <i class="right arrow grey icon"></i>
+        </a>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+
+  <!--footer-->
+
+</body>

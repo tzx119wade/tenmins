@@ -14,9 +14,9 @@ def index(request,cate=None):
     if cate == None:
         result_list = Article.objects.order_by('-createtime')
     if cate == 'hot':
-        result_list = Article.objects.filter(cate_choice='hot')
+        result_list = Article.objects.filter(cate_choice='hot').order_by('-createtime')
     if cate == 'best':
-        result_list = Article.objects.filter(cate_choice='best')
+        result_list = Article.objects.filter(cate_choice='best').order_by('-createtime')
 
 
     page_robot = Paginator(result_list, 9)
@@ -162,6 +162,7 @@ def publish_get(request,error_form=None):
 
     if error_form != None:
         form = error_form
+        print ([field for field in form])
     else:
         form = ArticleForm()
 
@@ -184,3 +185,45 @@ def publish_post(request):
 
     else:
         return publish_get(request,form)
+
+
+# search
+def search(request):
+    context = {}
+    article_list = []
+    # 首先判断是不是在搜索,通过有没有search这个参数来判断
+    if request.GET.get('search') == None:
+        return render(request, 'search.html')
+
+    search_name = request.GET.get('search')
+
+    query_set = Article.objects.filter(title__contains=search_name)
+    if query_set.count() == 0:
+        article_list = None
+    else:
+        # 生成分页器
+        page_robot = Paginator(query_set,9)
+        page_num = request.GET.get('page')
+        try:
+            article_list = page_robot.page(page_num)
+        except PageNotAnInteger:
+            article_list = page_robot.page(1)
+
+    context['article_list'] = article_list
+    context['search_name'] = search_name
+
+    return render(request, 'search.html', context)
+
+def search_page(request,page,name):
+    
+    context = {}
+    # 通过name查询数据
+    query_set = Article.objects.filter(title__contains=name)
+
+    page_robot = Paginator(query_set,9)
+    article_list = page_robot.page(int(page))
+    context['article_list'] = article_list
+    context['search_name'] = name
+
+    # 重新渲染页面
+    return render(request, 'search.html', context)

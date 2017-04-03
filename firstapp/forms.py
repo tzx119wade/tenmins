@@ -40,7 +40,7 @@ class ArticleForm(forms.Form):
         validators = [keyword,lessword]
         )
 
-        
+
     content = forms.CharField(
         label='内容',
         error_messages = {'required':'亲～一定要有标题哟'},
