@@ -35,7 +35,7 @@
   <!--搜索内容主体部分-->
   <div class="ui vertical basic segment main" style="width:760px;position:absolute;transform:translate(-50%,0);left:50%;top:100px;">
     <div class="container">
-      <form class="ui form" action="{% url 'search' %}" method="get">
+      <form class="ui form" action="{% url 'search' %}" method="get">{% csrf_token %}
         <div class="field">
           <div class="ui icon input">
             {% if search_name != None %}
@@ -107,34 +107,48 @@
       {% endif %}
 
 
-      <!--分页区-->
+      <!--重写分页逻辑-->
       {% if article_list != None %}
-      <div class="ui pagination menu" style="position:absolute;transform:translate(-50%,0);left:50%;">
+      <div class="ui pagination menu" style="position:absolute;transform:translate(-50%,0);left:50%;margin-bottom:60px;margin-top:40px;">
         {% if article_list.has_previous %}
           <a href="{% url 'search_page' page=article_list.previous_page_number name=search_name %}" class="item">
-            <i class="left red arrow icon"></i>
+            <i class="left arrow red icon"></i>
           </a>
         {% else %}
-        <a href="#" class="disabled item">
-          <i class="left grey arrow icon"></i>
-        </a>
+          <a href="#" class="disabled item">
+            <i class="left arrow grey icon"></i>
+          </a>
         {% endif %}
+        <!--取出index_list中的页码,点击相应的页码跳转到相应的页面-->
+        {% for index in index_list %}
+          {% if index != '...' %}
+            {% if index == article_list.number %}
+                <a href="{% url 'search_page' page=index name=search_name %}" class="active item">{{ index }}</a>
+            {% else %}
+                <a href="{% url 'search_page' page=index name=search_name %}" class="item">{{ index }}</a>
+            {% endif %}
+          {% else %}
+            <a href="#" class="disabled item">...</a>
+          {% endif %}
+        {% endfor %}
+
 
         {% if article_list.has_next %}
-        <a href="{% url 'search_page' page=article_list.next_page_number name=search_name%}" class="item">
-          <i class="right arrow red icon"></i>
-        </a>
+          <a href="{% url 'search_page' page=article_list.next_page_number name=search_name %}" class="item">
+            <i class="right arrow red icon"></i>
+          </a>
         {% else %}
-        <a href="#" class="disabled item">
-          <i class="right arrow grey icon"></i>
-        </a>
+          <a href="#" class="disabled item">
+            <i class="right arrow grey icon"></i>
+          </a>
         {% endif %}
       </div>
       {% endif %}
+
+
+
     </div>
   </div>
 
-
-  <!--footer-->
 
 </body>

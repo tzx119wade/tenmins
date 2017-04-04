@@ -32,7 +32,7 @@ urlpatterns = [
     url(r'^publish/$', publish_get, name='publish_get'),
     url(r'^publish/post/$', publish_post, name='publish_post'),
     url(r'^search/', search, name='search'),
-    url(r'^search_page/(?P<page>\d+)/(?P<name>[A-Za-z]+)', search_page, name='search_page'),
+    url(r'^search_page/page=(?P<page>\d+)&name=(?P<name>[A-Za-z]+)', search_page, name='search_page'),
 
 
 ]

@@ -189,6 +189,7 @@ def publish_post(request):
 
 # search
 def search(request):
+    index_list = []
     context = {}
     article_list = []
     # 首先判断是不是在搜索,通过有没有search这个参数来判断
@@ -208,6 +209,11 @@ def search(request):
             article_list = page_robot.page(page_num)
         except PageNotAnInteger:
             article_list = page_robot.page(1)
+        if page_robot.num_pages <= 5:
+            index_list = [1,2,3,4,5]
+        else:
+            index_list = [1,2,3,'...',page_robot.num_pages]
+        context['index_list'] = index_list
 
     context['article_list'] = article_list
     context['search_name'] = search_name
@@ -215,8 +221,8 @@ def search(request):
     return render(request, 'search.html', context)
 
 def search_page(request,page,name):
-    
     context = {}
+    index_list = []
     # 通过name查询数据
     query_set = Article.objects.filter(title__contains=name)
 
@@ -225,5 +231,23 @@ def search_page(request,page,name):
     context['article_list'] = article_list
     context['search_name'] = name
 
+    # 传递页码
+    # 1. 判断搜索结果是否小于5页
+    if page_robot.num_pages <=5:
+        # 构造页码数组
+        index_list = [x for x in range(1,(page_robot.num_pages + 1))]
+    else:
+        # 2. 如果当前页码数<=3
+        if article_list.number <= 3:
+            index_list = [1,2,3,'...',page_robot.num_pages]
+        elif article_list.number < page_robot.num_pages -2:
+            index_list = [article_list.number-2, article_list.number-1, article_list.number, '...', page_robot.num_pages]
+        elif article_list.number == page_robot.num_pages-2:
+            index_list = [article_list.number-2, article_list.number-2, article_list.number, page_robot.num_pages-1, page_robot.num_pages]
+        else:
+            index_list = [(page_robot.num_pages - x) for x in range(4,-1,-1)]
+
+    context['index_list'] = index_list
+    print (index_list)
     # 重新渲染页面
     return render(request, 'search.html', context)
