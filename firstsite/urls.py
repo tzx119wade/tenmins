@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from firstapp.views import index, detail, detail_comment, register, login,detail_vote, publish_get,publish_post, search, search_page
+from firstapp.views import index, detail, detail_comment, register, login,detail_vote, publish_get,publish_post, search
 from django.contrib.auth.views import logout
 
 
@@ -32,7 +32,6 @@ urlpatterns = [
     url(r'^publish/$', publish_get, name='publish_get'),
     url(r'^publish/post/$', publish_post, name='publish_post'),
     url(r'^search/', search, name='search'),
-    url(r'^search_page/page=(?P<page>\d+)&name=(?P<name>[A-Za-z]+)', search_page, name='search_page'),
 
 
 ]

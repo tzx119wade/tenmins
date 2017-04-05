@@ -189,65 +189,63 @@ def publish_post(request):
 
 # search
 def search(request):
-    index_list = []
     context = {}
-    article_list = []
-    # 首先判断是不是在搜索,通过有没有search这个参数来判断
-    if request.GET.get('search') == None:
+    index_list = []
+
+    if request.GET.get('name') == None:
+        print ('name is None')
         return render(request, 'search.html')
+    if request.GET.get('name')!= None and request.GET.get('cate') == None or request.GET.get('cate') == 'all':
+        # 这种情况就是在搜索all类型
+        name = request.GET.get('name')
+        query_set = Article.objects.filter(title__contains=name)
+        context['name'] = name
+        context['cate'] = 'all'
 
-    search_name = request.GET.get('search')
+    if request.GET.get('cate') == 'hot' or request.GET.get('cate') == 'best':
+        # 在搜索hot或者best类型
+        name = request.GET.get('name')
+        choice = request.GET.get('cate')
+        query_set = Article.objects.filter(title__contains=name,cate_choice=choice)
+        context['name'] = name
+        context['cate'] = choice
 
-    query_set = Article.objects.filter(title__contains=search_name)
-    if query_set.count() == 0:
-        article_list = None
-    else:
-        # 生成分页器
+    # 判断query_set是否有效，返回合适的article_list
+    if query_set.count() > 0:
+        # 如果有效，生成分页器，找出所请求的页面数据
         page_robot = Paginator(query_set,9)
         page_num = request.GET.get('page')
-        try:
+        try :
             article_list = page_robot.page(page_num)
-        except PageNotAnInteger:
+        except PageNotAnInteger :
             article_list = page_robot.page(1)
-        if page_robot.num_pages <= 5:
-            index_list = [1,2,3,4,5]
-        else:
-            index_list = [1,2,3,'...',page_robot.num_pages]
-        context['index_list'] = index_list
-
-    context['article_list'] = article_list
-    context['search_name'] = search_name
-
-    return render(request, 'search.html', context)
-
-def search_page(request,page,name):
-    context = {}
-    index_list = []
-    # 通过name查询数据
-    query_set = Article.objects.filter(title__contains=name)
-
-    page_robot = Paginator(query_set,9)
-    article_list = page_robot.page(int(page))
-    context['article_list'] = article_list
-    context['search_name'] = name
-
-    # 传递页码
-    # 1. 判断搜索结果是否小于5页
-    if page_robot.num_pages <=5:
-        # 构造页码数组
-        index_list = [x for x in range(1,(page_robot.num_pages + 1))]
+        except EmptyPage :
+            article_list = page_robot.page(page_robot.num_pages)
     else:
-        # 2. 如果当前页码数<=3
-        if article_list.number <= 3:
-            index_list = [1,2,3,'...',page_robot.num_pages]
-        elif article_list.number < page_robot.num_pages -2:
-            index_list = [article_list.number-2, article_list.number-1, article_list.number, '...', page_robot.num_pages]
-        elif article_list.number == page_robot.num_pages-2:
-            index_list = [article_list.number-2, article_list.number-2, article_list.number, page_robot.num_pages-1, page_robot.num_pages]
-        else:
-            index_list = [(page_robot.num_pages - x) for x in range(4,-1,-1)]
+        article_list = None
+    # 放入上下文
+    context['article_list'] = article_list
 
+    # 如果article_list = None
+    if article_list == None:
+        index_list = None
+    else:
+        # 传递页码
+        # 1. 判断搜索结果是否小于5页
+        if page_robot.num_pages <=5:
+            # 构造页码数组
+            index_list = [x for x in range(1,(page_robot.num_pages + 1))]
+        else:
+            # 2. 如果当前页码数<=3
+            if article_list.number <= 3:
+                index_list = [1,2,3,'...',page_robot.num_pages]
+            elif article_list.number < page_robot.num_pages -2:
+                index_list = [article_list.number-2, article_list.number-1, article_list.number, '...', page_robot.num_pages]
+            elif article_list.number == page_robot.num_pages-2:
+                index_list = [article_list.number-2, article_list.number-2, article_list.number, page_robot.num_pages-1, page_robot.num_pages]
+            else:
+                index_list = [(page_robot.num_pages - x) for x in range(4,-1,-1)]
+        
+    # 将页码放入上下文
     context['index_list'] = index_list
-    print (index_list)
-    # 重新渲染页面
     return render(request, 'search.html', context)

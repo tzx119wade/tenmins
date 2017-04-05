@@ -22,7 +22,7 @@
   <div class="ui inverted fixed top borderless menu" style="height:60px;">
     <div class="header item">
       <img src="https://cdn.sspai.com/user/725653_1488337112561.png?imageMogr2/quality/95/thumbnail/!80x80r/gravity/Center/crop/80x80" alt="" class="ui avatar image" style="width:40px;height:40px">
-      <span style="font-size:16px">少数派</span>
+      <span style="font-size:16px">麻瓜编程</span>
     </div>
 
     <div class="right menu">
@@ -38,11 +38,11 @@
       <form class="ui form" action="{% url 'search' %}" method="get">{% csrf_token %}
         <div class="field">
           <div class="ui icon input">
-            {% if search_name != None %}
-              <input type="text" name="search" value="" placeholder="{{ search_name }}">
+            {% if name != None %}
+              <input type="text" name="name" value="" placeholder="{{ name }}">
               <i class="search inverted circular icon"></i>
             {% else %}
-              <input type="text" name="search" value="" placeholder="请输入你感兴趣的内容...">
+              <input type="text" name="name" value="" placeholder="请输入你感兴趣的内容...">
               <i class="search inverted circular icon"></i>
             {% endif %}
           </div>
@@ -50,13 +50,36 @@
       </form>
       <!--菜单栏-->
       <div class="ui secondary pointing menu">
-        <a href="#" class="active item">All</a>
-        <a href="#" class="item">Hot</a>
-        <a href="#" class="item">Best</a>
+        {% if name == None %}
+          <a href="#" class="active disabled item">All</a>
+          <a href="#" class="disabled item">Hot</a>
+          <a href="#" class="disabled item">Best</a>
+        {% else %}
+          {% if 'all' in request.path   %}
+            <a href="?cate=all&name={{ name }}" class="active item">All</a>
+          {% else %}
+            <a href="?cate=all&name={{ name }}" class="item">All</a>
+          {% endif %}
+
+          {% if 'hot' in request.path %}
+            <a href="?cate=hot&name={{ name }}" class="active item">Hot</a>
+          {% else %}
+            <a href="?cate=hot&name={{ name }}" class="item">Hot</a>
+          {% endif %}
+
+          {% if 'best' in request.path %}
+            <a href="?cate=best&name={{ name }}" class="active item">Best</a>
+          {% else %}
+            <a href="?cate=best&name={{ name }}" class="item">Best</a>
+          {% endif %}
+        {% endif %}
+
       </div>
 
+
       <!--重写卡片内容-->
-      {% if search_name != None %}
+
+      {% if name != None %}
           {% if article_list != None %}
               {% for article in article_list %}
                   <div class="ui segment" style="width:760px;height:260px;">
@@ -84,7 +107,7 @@
         </a>
 
         <h3 class="ui header" style="margin-top:0px;">{{ article.title }}</h3>
-        <p style="color:#4a4a4a;line-height:1.625;">{{ article.content | truncatewords:30 }}</p>
+        <p style="color:#4a4a4a;line-height:1.625;">{{ article.content | truncatechars:200 }}</p>
         <div class="ui secondary menu">
           <div class="item">
             <i class="empty heart icon"></i>
@@ -107,11 +130,11 @@
       {% endif %}
 
 
-      <!--重写分页逻辑-->
+
       {% if article_list != None %}
       <div class="ui pagination menu" style="position:absolute;transform:translate(-50%,0);left:50%;margin-bottom:60px;margin-top:40px;">
         {% if article_list.has_previous %}
-          <a href="{% url 'search_page' page=article_list.previous_page_number name=search_name %}" class="item">
+          <a href="?cate={{ cate }}&name={{ name }}&page={{ article_list.previous_page_number }}" class="item">
             <i class="left arrow red icon"></i>
           </a>
         {% else %}
@@ -119,13 +142,13 @@
             <i class="left arrow grey icon"></i>
           </a>
         {% endif %}
-        <!--取出index_list中的页码,点击相应的页码跳转到相应的页面-->
+
         {% for index in index_list %}
           {% if index != '...' %}
             {% if index == article_list.number %}
-                <a href="{% url 'search_page' page=index name=search_name %}" class="active item">{{ index }}</a>
+                <a href="?cate={{ cate }}&name={{ name }}&page={{ index }}" class="active item">{{ index }}</a>
             {% else %}
-                <a href="{% url 'search_page' page=index name=search_name %}" class="item">{{ index }}</a>
+                <a href="?cate={{ cate }}&name={{ name }}&page={{ index }}" class="item">{{ index }}</a>
             {% endif %}
           {% else %}
             <a href="#" class="disabled item">...</a>
@@ -134,7 +157,7 @@
 
 
         {% if article_list.has_next %}
-          <a href="{% url 'search_page' page=article_list.next_page_number name=search_name %}" class="item">
+          <a href="?cate={{ cate }}&name={{ name }}&page={{ article_list.next_page_number }}" class="item">
             <i class="right arrow red icon"></i>
           </a>
         {% else %}
@@ -144,8 +167,6 @@
         {% endif %}
       </div>
       {% endif %}
-
-
 
     </div>
   </div>
