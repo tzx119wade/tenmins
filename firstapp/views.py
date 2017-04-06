@@ -245,7 +245,7 @@ def search(request):
                 index_list = [article_list.number-2, article_list.number-2, article_list.number, page_robot.num_pages-1, page_robot.num_pages]
             else:
                 index_list = [(page_robot.num_pages - x) for x in range(4,-1,-1)]
-        
+
     # 将页码放入上下文
     context['index_list'] = index_list
     return render(request, 'search.html', context)

@@ -20,6 +20,17 @@
             <h3><a href="#" style="color:White">TEN MINS</a></h3>
         </div>
 
+        <div class="item">
+          <form class="ui form" action="{% url 'search' %}" method="get">
+            <div class="field">
+              <div class="ui transparent inverted left icon input">
+                <input type="text" name="name" value="" placeholder="搜索你感兴趣的内容..." style="color:white">
+                <i class="search icon"></i>
+              </div>
+            </div>
+          </form>
+        </div>
+
         <div class="right menu">
             <div class="item">
                 <h5 class="ui inverted header">

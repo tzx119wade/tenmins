@@ -2,8 +2,8 @@ body {
     background-color: rgb(245, 245, 245);
     font-family: 'Raleway', sans-serif;
 }
-.ui.inverted.top.fixed.menu.borderless.red.menu {
-    background-color: #ff5144;
+.ui.inverted.top.fixed.menu.borderless.menu {
+    background-color:#ff5144;
 }
 
 
