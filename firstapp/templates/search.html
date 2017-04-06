@@ -77,7 +77,7 @@
               {% for article in article_list %}
                 {% if article.cate_choice == 'hot' %}
                 <div class="ui segment" style="width:760px;height:260px;">
-                  <a class="ui orange right ribbon label">hot</a>
+                  <a class="ui orange right ribbon label" style="position:absolute;left:772px;top:5px">hot</a>
                   <div class="ui secondary menu">
         <div class="item" style="padding-left:0px;">
           <img src="{% static 'images/default.png' %}" class="ui circular image" style="width:40px;height:40px;">
@@ -117,7 +117,7 @@
                 </div>
                 {% elif article.cate_choice == 'best' %}
                 <div class="ui segment" style="width:760px;height:260px;">
-                  <a class="ui teal right ribbon label">best</a>
+                  <a class="ui teal right ribbon label" style="position:absolute;left:772px;top:5px">best</a>
                   <div class="ui secondary menu">
         <div class="item" style="padding-left:0px;">
           <img src="{% static 'images/default.png' %}" class="ui circular image" style="width:40px;height:40px;">
