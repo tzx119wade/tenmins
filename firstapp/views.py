@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect,HttpResponse
-from firstapp.models import Article,Tickets, Comment_New
-from firstapp.forms import CommentForm, ArticleForm
+from firstapp.models import Article,Tickets, Comment_New, UserProfile
+from firstapp.forms import CommentForm, ArticleForm, ProfileForm
 from django.core.paginator import Paginator, EmptyPage,PageNotAnInteger
 from django.contrib.auth import login as auth_login , authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
@@ -49,10 +50,16 @@ def index(request,cate=None):
         index_list = [page_robot.num_pages-x for x in range(4,-1,-1)]
 
 
-
+    # 是否修改过头像、资料
+    try:
+        my_profile = request.user.userprofle
+    except ObjectDoesNotExist:
+        my_profile = None
+    
     context = {}
     context['index_list'] = index_list
     context["article_list"] = article_list
+    context['my_profile'] = my_profile
     return render(request, 'index.html', context)
 
 
@@ -249,3 +256,54 @@ def search(request):
     # 将页码放入上下文
     context['index_list'] = index_list
     return render(request, 'search.html', context)
+
+
+# 个人中心
+@login_required
+def user_profile(request,error_form=None):
+    context = {}
+    # 检查是否更新过个人资料
+    try:
+        new_profile = request.user.userprofle
+    except ObjectDoesNotExist:
+        new_profile = None
+
+    context['new_profile'] = new_profile
+
+    if error_form == None:
+        if request.GET.get('cate') == None:
+            form = ProfileForm()
+            context['form'] = form
+            return render(request,'myinfo.html',context)
+        else:
+            cate = request.GET.get('cate')
+            context['cate']=cate
+            form = ProfileForm()
+            context['form'] = form
+            return render(request, 'myinfo.html',context)
+    else:
+        context['form'] = error_form
+        return render(request, 'myinfo.html',context)
+
+@login_required
+def setprofile(request):
+    form = ProfileForm(request.POST,request.FILES)
+    if form.is_valid():
+        # 判断是否更改过个人资料
+        try:
+            # 创建过的话，就直接更新
+            my_profile = request.user.userprofle
+            my_profile.avatar = request.FILES['avatar']
+            my_profile.nickname = form.cleaned_data['name']
+            my_profile.gender = form.cleaned_data['sexy']
+            my_profile.save()
+        except ObjectDoesNotExist:
+            # 如果没有创建，就创建一个新的userprofile对象
+            image = request.FILES['avatar']
+            name = form.cleaned_data['name']
+            sexy = form.cleaned_data['sexy']
+            userprofile = UserProfile(avatar=image,belong_to=request.user,gender=sexy,nickname=name)
+            userprofile.save()
+        return redirect('user_profile')
+    else:
+        return user_profile(request,form)

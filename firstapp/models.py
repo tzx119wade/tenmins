@@ -3,6 +3,8 @@ from django.utils import timezone
 from faker import Faker
 import re
 from django.contrib.auth.models import User
+from django.core.files.storage import FileSystemStorage
+fs = FileSystemStorage(location='/Users/pro/Desktop/Django/django-2.2/django-2.5/upload/profile_image ')
 
 # Create your models here.
 class Article(models.Model):
@@ -59,3 +61,20 @@ class Tickets(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+# 扩展user模型
+class UserProfile(models.Model):
+    avatar = models.ImageField(upload_to='profile_image')
+
+    belong_to = models.OneToOneField(to=User,related_name='userprofle')
+
+    GENDER_CHOICE = {
+        ('男生','男生'),
+        ('女生','女生'),
+    }
+    gender = models.CharField(choices=GENDER_CHOICE,blank=True,null=True,max_length=100)
+
+    nickname = models.CharField(max_length=100,blank=True,null=True)
+
+    def __str__(self):
+        return self.nickname

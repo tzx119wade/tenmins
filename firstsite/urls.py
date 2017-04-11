@@ -15,8 +15,12 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from firstapp.views import index, detail, detail_comment, register, login,detail_vote, publish_get,publish_post, search
+from firstapp.views import index, detail, detail_comment, register, login,detail_vote, publish_get,publish_post, search,user_profile,setprofile
 from django.contrib.auth.views import logout
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+
 
 
 urlpatterns = [
@@ -32,6 +36,11 @@ urlpatterns = [
     url(r'^publish/$', publish_get, name='publish_get'),
     url(r'^publish/post/$', publish_post, name='publish_post'),
     url(r'^search/', search, name='search'),
+    url(r'^profile/', user_profile, name='user_profile'),
+    url(r'^setprofile', setprofile, name='setprofile'),
 
 
 ]
+
+urlpatterns += staticfiles_urlpatterns()
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

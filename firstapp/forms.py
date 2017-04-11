@@ -1,6 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
+from .models import UserProfile
 import re
 
 def keyword(comment):
@@ -12,11 +13,28 @@ def keyword(comment):
 
 def lessword(comment):
     if len(comment) < 4 :
-        raise ValidationError('评论内容需超过4个字～～')
+        raise ValidationError('不得少于4个字符～～')
+
+def bigword(name):
+    if len(name) > 40:
+        raise ValidationError('用户名不能超过40个字符')
+
+# 修改用户名,性别，头像的表单
+class ProfileForm(forms.Form):
+    name = forms.CharField(
+        label = '你的昵称',
+        max_length=40,
+        error_messages = {'require':'昵称不能为空哦～～',},
+        widget = forms.TextInput(attrs={'placeholder':'新的昵称'}),
+        validators = [bigword,lessword]
+        )
+    CHOICES = (('男生', '男生',), ('女生', '女生',))
+    sexy = forms.ChoiceField(choices=CHOICES,widget=forms.Select,label='你的性别')
+    avatar = forms.ImageField(label='上传新头像')
+
 
 class CommentForm(forms.Form):
 
-    # name = forms.CharField(max_length=50)
     comment = forms.CharField(
         widget = forms.Textarea(attrs={'placeholder':'添加一条评论吧～'}),
         error_messages = {

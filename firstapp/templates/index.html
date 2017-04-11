@@ -35,13 +35,21 @@
             <div class="item">
                 <h5 class="ui inverted header">
                         <div class="ui avatar image">
-                            <img src="{% static 'images/default.png' %}" alt="">
+                          {% if request.user.is_authenticated and my_profile != None %}
+                          <a href="{% url 'user_profile' %}"><img src="{{ request.user.userprofle.avatar.url }}" alt=""></a>
+                          {% elif request.user.is_authenticated and my_profile == None %}
+                          <a href="{% url 'user_profile' %}"><img src="{% static 'images/default.png' %}" alt=""></a>
+                          {% else %}
+                          <img src="{% static 'images/default.png' %}" alt="">
+                          {% endif %}
                         </div>
 
-                        {% if request.user.is_authenticated  %}
-                        <span>{{ request.user.username }}</span>
+                        {% if request.user.is_authenticated and my_profile != None %}
+                        <span>{{ request.user.userprofle.nickname }}</span>
+                        {% elif request.user.is_authenticated and my_profile == None %}
+                        <span>还没有设置昵称哟</span>
                         {% else %}
-                          <span>游客你好</span>
+                        <span>游客你好</span>
                         {% endif %}
 
                     </h5>
