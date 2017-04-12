@@ -97,6 +97,8 @@
                 {% if new_profile != None %}
                 <h4 class="ui dividing header" style="color:grey">你的昵称</h4>
                 <span style="font-weight:bold">{{ request.user.userprofle.nickname }}</span>
+                <h4 class="ui dividing header" style="color:grey">用户名</h4>
+                <span style="font-weight:bold">{{ request.user.username }}</span>
                 <h4 class="ui dividing header" style="color:grey">性别</h4>
                 <span style="font-weight:bold">{{ request.user.userprofle.gender }}</span>
                 {% else %}
