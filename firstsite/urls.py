@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from firstapp.views import index, detail, detail_comment, register, login,detail_vote, publish_get,publish_post, search,user_profile,setprofile
+from firstapp.views import index, detail, detail_comment, register, login,detail_vote, publish_get,publish_post, search,user_profile,setprofile,password_change
 from django.contrib.auth.views import logout
 from django.conf import settings
 from django.conf.urls.static import static
@@ -38,6 +38,7 @@ urlpatterns = [
     url(r'^search/', search, name='search'),
     url(r'^profile/', user_profile, name='user_profile'),
     url(r'^setprofile', setprofile, name='setprofile'),
+    url(r'^password', password_change, name='password_change'),
 
 
 ]

@@ -4,7 +4,6 @@ from faker import Faker
 import re
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
-fs = FileSystemStorage(location='/Users/pro/Desktop/Django/django-2.2/django-2.5/upload/profile_image ')
 
 # Create your models here.
 class Article(models.Model):

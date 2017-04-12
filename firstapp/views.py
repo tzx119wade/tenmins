@@ -2,11 +2,13 @@ from django.shortcuts import render, redirect,HttpResponse
 from firstapp.models import Article,Tickets, Comment_New, UserProfile
 from firstapp.forms import CommentForm, ArticleForm, ProfileForm
 from django.core.paginator import Paginator, EmptyPage,PageNotAnInteger
-from django.contrib.auth import login as auth_login , authenticate
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth import login as auth_login , authenticate ,update_session_auth_hash
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+
 
 # Create your views here.
 
@@ -53,9 +55,9 @@ def index(request,cate=None):
     # 是否修改过头像、资料
     try:
         my_profile = request.user.userprofle
-    except ObjectDoesNotExist:
+    except ObjectDoesNotExist and AttributeError:
         my_profile = None
-    
+
     context = {}
     context['index_list'] = index_list
     context["article_list"] = article_list
@@ -260,8 +262,9 @@ def search(request):
 
 # 个人中心
 @login_required
-def user_profile(request,error_form=None):
+def user_profile(request,error_form=None,error_password_form=None):
     context = {}
+    index_list = []
     # 检查是否更新过个人资料
     try:
         new_profile = request.user.userprofle
@@ -269,7 +272,54 @@ def user_profile(request,error_form=None):
         new_profile = None
 
     context['new_profile'] = new_profile
+    # 渲染密码表单
+    password_form = PasswordChangeForm(request.user)
+    context['password_form'] = password_form
 
+    # 获取点赞的数据
+    user_like_tickets_count = request.user.tickers.filter(vote='like').count()
+    print (user_like_tickets_count)
+
+
+
+    # 判断是否有点赞的数据
+    if user_like_tickets_count > 0:
+        context['fav_articles'] = True
+        all_tickets = request.user.tickers.all()
+        # 构造分页器
+        page_robot = Paginator(all_tickets,3)
+        page_num = request.GET.get('page')
+        # 获取当页请求的数据
+        try:
+            result = page_robot.page(page_num)
+        except EmptyPage:
+            result = page_robot.page(page_robot.num_pages)
+        except PageNotAnInteger:
+            result = page_robot.page(1)
+
+        context['result'] = result
+        # 传递页码
+        if page_robot.num_pages <=5:
+            # 构造页码数组
+            index_list = [x for x in range(1,(page_robot.num_pages + 1))]
+        else:
+            # 2. 如果当前页码数<=3
+            if result.number <= 3:
+                index_list = [1,2,3,'...',page_robot.num_pages]
+            elif result.number < page_robot.num_pages -2:
+                index_list = [result.number-2, result.number-1, result.number, '...', page_robot.num_pages]
+            elif result.number == page_robot.num_pages-2:
+                index_list = [result.number-2, result.number-2, result.number, page_robot.num_pages-1, page_robot.num_pages]
+            else:
+                index_list = [(page_robot.num_pages - x) for x in range(4,-1,-1)]
+        context['index_list'] = index_list
+
+    else:
+        context['fav_articles'] = False
+
+    print (index_list)
+
+    # 处理修改个人资料的表单业务
     if error_form == None:
         if request.GET.get('cate') == None:
             form = ProfileForm()
@@ -307,3 +357,19 @@ def setprofile(request):
         return redirect('user_profile')
     else:
         return user_profile(request,form)
+
+# 修改密码
+@login_required
+def password_change(request):
+    context={}
+    # 绑定表单
+    form = PasswordChangeForm(request.user,request.POST)
+    # 判断是否有效
+    if form.is_valid():
+        user = form.save()
+        # 更新浏览器session
+        update_session_auth_hash(request,user)
+        return HttpResponse('<h3>密码修改成功</h3>')
+    else:
+        error = form.errors
+        return HttpResponse('<h3>密码修改失败</h3>%s'%error)

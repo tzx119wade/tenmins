@@ -10,38 +10,38 @@
 
     </head>
     <body>
-        <div class="ui inverted top fixed menu borderless red menu">
-            <div class="header item">
-                <div class="ui image">
-                    <img src="{% static 'images/tenlogo.png' %}" alt="">
-                </div>
-            </div>
+      <div class="ui inverted top fixed menu borderless red menu">
+          <div class="header item">
+              <a href="{% url 'index' %}" class="ui image">
+                <img src="{% static 'images/tenlogo.png' %}" alt="">
+              </a>
+          </div>
 
-            <div class="right menu">
-                <div class="item">
-                    <h5 class="ui inverted header">
-                            <div class="ui mini circular image">
-                              {% if new_profile != None %}
-                                <img src="{{ request.user.userprofle.avatar.url }}" alt="">
-                              {% else %}
-                                <img src="{% static 'images/hou30.jpg' %}" alt="">
-                              {% endif %}
-                            </div>
+          <div class="right menu">
+              <div class="item">
+                  <h5 class="ui inverted header">
+                          <div class="ui mini circular image">
                             {% if new_profile != None %}
-                            <span>{{ request.user.userprofle.nickname }}</span>
+                              <img src="{{ request.user.userprofle.avatar.url }}" alt="">
                             {% else %}
-                            <span>快去设置昵称吧</span>
+                              <img src="{% static 'images/hou30.jpg' %}" alt="">
                             {% endif %}
+                          </div>
+                          {% if new_profile != None %}
+                          <span>{{ request.user.userprofle.nickname }}</span>
+                          {% else %}
+                          <span>快去设置昵称吧</span>
+                          {% endif %}
 
-                        </h5>
-                </div>
-                <div class="item">
+                      </h5>
+              </div>
+              <div class="item">
 
-                    <a href="#logout/" class="ui inverted circular button">Logout</a>
+                  <a href="{% url 'logout' %}" class="ui inverted circular button">Logout</a>
 
-                </div>
-            </div>
-        </div>
+              </div>
+          </div>
+      </div>
         <div class="ui  raised container segments">
             <div class="ui head basic segment" style="background-image: url('{% static 'images/bg.png' %}');">
                 <div class="ui circular image cover" style="width:100px;height:100px">
@@ -73,7 +73,7 @@
               {% if cate == 'myinfo' or cate == None %}
 
               <div class="ui vertical text menu">
-                {% if 'myprofile' in request.get_full_path or 'setprofile' not in request.get_full_path %}
+                {% if 'myprofile' in request.get_full_path or 'setprofile' not in request.get_full_path and 'setpassword' not in request.get_full_path %}
                   <a href="?tab=myprofile" class="active item" style="font-weight:bold">我的资料</a>
                 {% else %}
                   <a href="?tab=myprofile" class="item">我的资料</a>
@@ -84,10 +84,15 @@
                 {% else %}
                   <a href="?tab=setprofile" class="item">资料设置</a>
                 {% endif %}
-                 <a href="#" class="item">修改密码</a>
+
+                {% if 'setpassword' in request.get_full_path %}
+                <a href="?tab=setpassword" class="active item">修改密码</a>
+                {% else %}
+                <a href="?tab=setpassword" class="item">修改密码</a>
+                {% endif %}
               </div>
 
-              {% if 'myprofile' in request.get_full_path or 'setprofile' not in request.get_full_path %}
+              {% if 'myprofile' in request.get_full_path or 'setprofile' not in request.get_full_path and 'setpassword' not in request.get_full_path %}
               <div class="ui basic very padded segment container info" style="padding-top:0px;width:540px">
                 {% if new_profile != None %}
                 <h4 class="ui dividing header" style="color:grey">你的昵称</h4>
@@ -128,34 +133,72 @@
                 <button type="submit" class="ui right floated red button">提交</button>
               </form>
 
+              {% elif 'setpassword' in request.get_full_path %}
+              <div class="ui center basic segment container">
+                <form class="ui form" action="{% url 'password_change' %}" method="post">{% csrf_token %}
+                  {% for field in password_form %}
+                    {{ field.label }}
+                    {{ field }}
+                  {% endfor %}
+                  <button type="submit" name="button" class="ui blue right floated button">提交</button>
+                </form>
+              </div>
+
               {% endif %}
 
               {% elif cate == 'myfav' %}
               <div class="ui basic very padded segment container info" style="width:530px;">
-                  <img class="ui top aligned tiny image" src="{% static 'images/img1.jpg' %}" style="width:80px;height:55px;">
-                  <span>把英语记在大脑里存中文的地方，就再也不会忘记了</span>
-                  <div class="ui divider"></div>
-                  <img class="ui top aligned tiny image" src="{% static 'images/img3.jpg' %}"  style="width:80px;height:55px;">
-                  <span>常常熬夜的我，感觉很对不起辛辛苦苦进化的它们</span>
-                  <div class="ui divider"></div>
-                  <img class="ui top aligned tiny image" src="{% static 'images/img4.jpg' %}" style="width:80px;height:55px;">
-                  <span>想进我们公司，先来测测你的性格吧</span>
+
+                  {% for ticket in result %}
+                    <a class="ui top aligned tiny image" href="{% url 'detail' ticket.article.id %}"><img src="{{ ticket.article.img }}" style="width:80px;height:55px;"></a>
+                    <span style="color:black;font-weight:bold">{{ ticket.article.title | truncatechars:50 }}</span>
+                    <div class="ui divider"></div>
+                  {% endfor %}
+
               </div>
+
+
               <div class="ui center aligned very padded vertical segment container">
-                  <div class="ui pagination menu">
-                      <a class="item">
-                          <i class="icon red left arrow"></i>
-                      </a>
-                      <a class="active item">
-                          1
-                      </a>
-                      <a class="item">
-                          2
-                      </a>
-                      <a class="item">
-                          <i class="icon red right arrow"></i>
-                      </a>
-                  </div>
+                {% if fav_articles == True %}
+                <div class="ui pagination menu" style="position:relative;bottom:18px;">
+
+                  {% if result.has_previous %}
+                  <a class="item" href="?cate=myfav&page={{ result.previous_page_number }}">
+                      <i class="icon red left arrow"></i>
+                  </a>
+                  {% else %}
+                  <a class="item">
+                      <i class="icon grey left arrow"></i>
+                  </a>
+                  {% endif %}
+
+
+                  {% for index in index_list %}
+                    {% if index != '...' %}
+                      {% if index == result.number %}
+                        <a href="?cate=myfav&page={{ index }}" class="active item">{{ index }}</a>
+                      {% else %}
+                        <a href="?cate=myfav&page={{ index }}" class="item">{{ index }}</a>
+                      {% endif %}
+                    {% else %}
+                        <a class="disabled item">...</a>
+                    {% endif %}
+                  {% endfor %}
+
+                  {% if result.has_next %}
+                  <a class="item" href="?cate=myfav&page={{ result.next_page_number }}">
+                      <i class="icon red right arrow"></i>
+                  </a>
+                  {% else %}
+                  <a class="item">
+                      <i class="icon grey right arrow"></i>
+                  </a>
+                  {% endif %}
+
+                </div>
+                {% else %}
+                <h4 class="ui center aligned header">你还没有点赞的记录哟，快去首页瞅瞅吧</h4>
+                {% endif %}
               </div>
               {% endif %}
 
